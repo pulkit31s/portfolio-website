@@ -80,7 +80,7 @@ Edit `.env.local`:
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/portfolio
 NEXTAUTH_SECRET=your-random-secret-32-chars-minimum
 NEXTAUTH_URL=http://localhost:3000
-ADMIN_EMAIL=pulkitsinghroha7856@gmail.com
+ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=your-secure-admin-password
 ```
 

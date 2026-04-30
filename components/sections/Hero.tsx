@@ -131,7 +131,7 @@ export default function Hero() {
             View Projects
           </button>
           <a
-            href="mailto:pulkitsinghroha7856@gmail.com"
+            href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com'}`}
             className="px-8 py-3 text-sm font-mono tracking-widest uppercase text-white/70 rounded-full transition-all duration-300 hover:text-white hover:border-[#00d4ff]/50"
             style={{ border: '1px solid rgba(255,255,255,0.15)' }}
           >
@@ -144,7 +144,7 @@ export default function Hero() {
           {[
             { label: 'GitHub',   href: 'https://github.com' },
             { label: 'LinkedIn', href: 'https://linkedin.com' },
-            { label: 'Email',    href: 'mailto:pulkitsinghroha7856@gmail.com' },
+            { label: 'Email',    href: `mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com'}` },
           ].map(s => (
             <a
               key={s.label}

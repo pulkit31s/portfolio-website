@@ -1,11 +1,12 @@
 'use client';
 
 export default function Contact() {
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'hello@example.com';
   const links = [
-    { label: 'Email',    href: 'mailto:pulkitsinghroha7856@gmail.com', value: 'pulkitsinghroha7856@gmail.com', icon: '✉' },
-    { label: 'LinkedIn', href: 'https://linkedin.com',                  value: 'linkedin.com/in/pulkit',        icon: '◈' },
-    { label: 'GitHub',   href: 'https://github.com',                    value: 'github.com/pulkit',             icon: '◎' },
-    { label: 'Phone',    href: 'tel:+918307902122',                     value: '+91 8307902122',                icon: '◉' },
+    { label: 'Email',    href: `mailto:${contactEmail}`, value: contactEmail, icon: '✉' },
+    { label: 'LinkedIn', href: 'https://linkedin.com',                  value: 'linkedin.com/in/yourprofile',        icon: '◈' },
+    { label: 'GitHub',   href: 'https://github.com',                    value: 'github.com/yourprofile',             icon: '◎' },
+    { label: 'Phone',    href: 'tel:+1-000-000-0000',                     value: '+1 (000) 000-0000',                icon: '◉' },
   ];
 
   return (
@@ -26,7 +27,7 @@ export default function Contact() {
       </div>
 
       <a
-        href="mailto:pulkitsinghroha7856@gmail.com"
+        href={`mailto:${contactEmail}`}
         className="inline-block mb-16 px-10 py-4 text-sm font-mono tracking-widest uppercase text-black font-bold rounded-full transition-all duration-300 hover:scale-105 hover:shadow-2xl"
         style={{ background: 'linear-gradient(135deg, #00d4ff, #7c3aed)', boxShadow: '0 0 40px rgba(0,212,255,0.25)' }}
       >
