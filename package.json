@@ -1,0 +1,37 @@
+{
+  "name": "pulkit-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "ts-node --project tsconfig.json -r tsconfig-paths/register scripts/seed.ts"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.99.0",
+    "@react-three/fiber": "^8.15.0",
+    "dotenv": "^17.4.2",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "mongoose": "^8.0.0",
+    "next": "14.2.0",
+    "next-auth": "^4.24.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "three": "^0.162.0",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/three": "^0.162.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^3.4.0",
+    "ts-node": "^10.9.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.0.0"
+  }
+}
