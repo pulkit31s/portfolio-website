@@ -79,7 +79,7 @@ Edit `.env.local`:
 ```env
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/portfolio
 NEXTAUTH_SECRET=your-random-secret-32-chars-minimum
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:3000 (or your production domain)
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=your-secure-admin-password
 ```
@@ -105,11 +105,11 @@ This populates MongoDB with all your resume data (projects, experience, skills, 
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) 🎉
+Open your browser to `http://localhost:3000` 🎉
 
 ## 🔐 Admin Panel
 
-Visit [http://localhost:3000/admin](http://localhost:3000/admin)
+Navigate to `/admin` on your local or deployed domain
 
 Login with the credentials you set in `.env.local`:
 - **Email**: `ADMIN_EMAIL`
