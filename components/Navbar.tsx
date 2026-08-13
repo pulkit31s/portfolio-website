@@ -1,21 +1,77 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-const links = ['About', 'Skills', 'Experience', 'Projects', 'Achievements', 'Contact'];
+const allLinks = ['About', 'Education', 'Skills', 'Experience', 'Projects', 'Achievements', 'Certifications', 'Contact'];
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [active, setActive]     = useState('');
-  const [open, setOpen]         = useState(false);
+  const [scrolled, setScrolled]             = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [active, setActive]                 = useState('About');
+  const [open, setOpen]                     = useState(false);
+  const [enabledSections, setEnabledSections] = useState<Record<string, boolean>>({
+    education: true,
+    skills: true,
+    experience: true,
+    projects: true,
+    achievements: true,
+    certifications: false,
+  });
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 60);
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      if (total > 0) {
+        setScrollProgress(Math.min(1, Math.max(0, window.scrollY / total)));
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    fetch('/api/profile')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.sections) {
+          setEnabledSections(data.sections);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const links = allLinks.filter(l => {
+    const key = l.toLowerCase();
+    if (key === 'about' || key === 'contact') return true;
+    return enabledSections[key] ?? true;
+  });
+
+  // IntersectionObserver for active section highlighting on scroll
+  useEffect(() => {
+    const sectionIds = ['about', 'education', 'skills', 'experience', 'projects', 'achievements', 'certifications', 'contact'];
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const matchedLabel = allLinks.find(l => l.toLowerCase() === entry.target.id);
+            if (matchedLabel) setActive(matchedLabel);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [enabledSections]);
+
   const scrollTo = (id: string) => {
-    document.getElementById(id.toLowerCase())?.scrollIntoView({ behavior: 'smooth' });
+    const targetId = id.toLowerCase() === 'about' ? 'about' : id.toLowerCase();
+    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
     setActive(id);
     setOpen(false);
   };
@@ -29,6 +85,18 @@ export default function Navbar() {
         borderBottom: scrolled ? '1px solid rgba(0,212,255,0.08)' : 'none',
       }}
     >
+      {/* Scroll Progress Bar */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/5 pointer-events-none">
+        <div
+          className="h-full transition-transform duration-75 ease-out origin-left"
+          style={{
+            transform: `scaleX(${scrollProgress})`,
+            background: 'linear-gradient(90deg, #00d4ff, #7c3aed, #ec4899)',
+            boxShadow: '0 0 8px rgba(0,212,255,0.6)',
+          }}
+        />
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <button
@@ -36,7 +104,7 @@ export default function Navbar() {
           className="text-xl font-black tracking-widest text-white"
           style={{ fontFamily: "'Courier New', monospace", textShadow: '0 0 20px rgba(0,212,255,0.6)' }}
         >
-          P<span style={{ color: '#00d4ff' }}>.</span>
+          PULKIT<span style={{ color: '#00d4ff' }}>.</span>
         </button>
 
         {/* Desktop links */}

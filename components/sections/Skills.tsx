@@ -102,15 +102,39 @@ export default function Skills() {
     return acc;
   }, {});
 
+  const [viewMode, setViewMode] = useState<'bars' | 'grid'>('bars');
+
   return (
     <section id="skills" className="py-32 px-6 max-w-6xl mx-auto" ref={ref}>
       {/* Section header */}
-      <div className="mb-16">
-        <p className="text-[#00d4ff] text-xs font-mono tracking-[0.4em] uppercase mb-3">02 — Skills</p>
-        <h2 className="text-4xl md:text-5xl font-black text-white" style={{ fontFamily: "'Courier New', monospace" }}>
-          Tech Arsenal
-        </h2>
-        <div className="mt-4 w-24 h-px" style={{ background: 'linear-gradient(90deg, #00d4ff, transparent)' }} />
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+        <div>
+          <p className="text-[#00d4ff] text-xs font-mono tracking-[0.4em] uppercase mb-3">02 — Skills</p>
+          <h2 className="text-4xl md:text-5xl font-black text-white" style={{ fontFamily: "'Courier New', monospace" }}>
+            Tech Arsenal
+          </h2>
+          <div className="mt-4 w-24 h-px" style={{ background: 'linear-gradient(90deg, #00d4ff, transparent)' }} />
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 self-start md:self-auto">
+          <button
+            onClick={() => setViewMode('bars')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+              viewMode === 'bars' ? 'bg-[#00d4ff]/20 text-[#00d4ff] font-bold border border-[#00d4ff]/30' : 'text-white/40 hover:text-white'
+            }`}
+          >
+            Bars View
+          </button>
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
+              viewMode === 'grid' ? 'bg-[#00d4ff]/20 text-[#00d4ff] font-bold border border-[#00d4ff]/30' : 'text-white/40 hover:text-white'
+            }`}
+          >
+            Pills Grid
+          </button>
+        </div>
       </div>
 
       {/* Category tabs */}
@@ -136,30 +160,53 @@ export default function Skills() {
         })}
       </div>
 
-      {/* Skills grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.entries(grouped).map(([cat, items]) => (
-          <div
-            key={cat}
-            className="rounded-2xl p-6"
-            style={{
-              background: 'rgba(13,13,26,0.6)',
-              border: `1px solid ${categoryColors[cat] || '#00d4ff'}18`,
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-2 h-2 rounded-full" style={{ background: categoryColors[cat] || '#00d4ff' }} />
-              <span className="text-xs font-mono tracking-widest uppercase" style={{ color: categoryColors[cat] || '#00d4ff' }}>
-                {categoryLabels[cat] || cat}
-              </span>
+      {/* Skills grid / view mode rendering */}
+      {viewMode === 'bars' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Object.entries(grouped).map(([cat, items]) => (
+            <div
+              key={cat}
+              className="rounded-2xl p-6 transition-all duration-300"
+              style={{
+                background: 'rgba(13,13,26,0.6)',
+                border: `1px solid ${categoryColors[cat] || '#00d4ff'}18`,
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-2 h-2 rounded-full" style={{ background: categoryColors[cat] || '#00d4ff' }} />
+                <span className="text-xs font-mono tracking-widest uppercase" style={{ color: categoryColors[cat] || '#00d4ff' }}>
+                  {categoryLabels[cat] || cat}
+                </span>
+              </div>
+              <div className="flex flex-col gap-4">
+                {items.map(s => <SkillBar key={s._id} skill={s} visible={visible} />)}
+              </div>
             </div>
-            <div className="flex flex-col gap-4">
-              {items.map(s => <SkillBar key={s._id} skill={s} visible={visible} />)}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-3 p-8 rounded-3xl" style={{ background: 'rgba(13,13,26,0.6)', border: '1px solid rgba(0,212,255,0.1)' }}>
+          {filtered.map(s => {
+            const color = categoryColors[s.category] || '#00d4ff';
+            return (
+              <div
+                key={s._id}
+                className="group px-4 py-2.5 rounded-2xl flex items-center gap-3 transition-all duration-300 hover:scale-105"
+                style={{
+                  background: `${color}0c`,
+                  border: `1px solid ${color}30`,
+                }}
+              >
+                <span className="text-sm font-mono text-white group-hover:text-[#00d4ff] transition-colors">{s.name}</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full" style={{ background: `${color}20`, color }}>
+                  {s.proficiency}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

@@ -16,13 +16,18 @@ export default function LoadingScreen({ onComplete }: Props) {
     const el = mountRef.current;
     if (!el) return;
 
-    const scene    = new THREE.Scene();
-    const camera   = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    let renderer: THREE.WebGLRenderer | null = null;
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    el.appendChild(renderer.domElement);
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      el.appendChild(renderer.domElement);
+    } catch (err) {
+      console.warn('WebGL Context creation failed, continuing loading sequence with CSS fallback:', err);
+    }
 
     // Particle system
     const geometry = new THREE.BufferGeometry();
@@ -87,9 +92,9 @@ export default function LoadingScreen({ onComplete }: Props) {
       ico.rotation.x = t * 0.3;
       ico.rotation.y = t * 0.5;
 
-      renderer.render(scene, camera);
+      if (renderer) renderer.render(scene, camera);
     };
-    animate();
+    if (renderer) animate();
 
     const timer = setTimeout(() => {
       clearInterval(progInterval);
@@ -101,7 +106,7 @@ export default function LoadingScreen({ onComplete }: Props) {
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      if (renderer) renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', handleResize);
 
@@ -109,9 +114,11 @@ export default function LoadingScreen({ onComplete }: Props) {
       clearTimeout(timer);
       clearInterval(progInterval);
       cancelAnimationFrame(frame);
-      renderer.dispose();
+      if (renderer) {
+        renderer.dispose();
+        if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
+      }
       window.removeEventListener('resize', handleResize);
-      if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
     };
   }, [onComplete]);
 

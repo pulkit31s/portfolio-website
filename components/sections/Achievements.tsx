@@ -28,6 +28,16 @@ export default function Achievements() {
       .catch(() => {});
   }, []);
 
+  const intlCount   = achievements.filter(a => a.international).length;
+  const totalCount  = achievements.length;
+
+  const stats = [
+    { value: `${intlCount > 0 ? intlCount : 2}×`, label: 'International Finalist' },
+    { value: `${totalCount}+`, label: 'Hackathons & Contests' },
+    { value: '5000+', label: 'Competitors Defeated' },
+    { value: '9.02', label: 'B.Tech CSE CGPA' },
+  ];
+
   return (
     <section id="achievements" className="py-32 px-6 max-w-6xl mx-auto">
       <div className="mb-16">
@@ -40,21 +50,16 @@ export default function Achievements() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-        {[
-          { value: '3+', label: 'Hackathons Won' },
-          { value: '2×', label: 'International Finalist' },
-          { value: '5000+', label: 'Competed Against' },
-          { value: '8.99', label: 'CGPA' },
-        ].map(s => (
+        {stats.map(s => (
           <div
             key={s.label}
-            className="rounded-2xl p-5 text-center"
+            className="rounded-2xl p-5 text-center transition-all duration-300 hover:border-[#00d4ff]/30 hover:-translate-y-0.5"
             style={{ background: 'rgba(13,13,26,0.6)', border: '1px solid rgba(0,212,255,0.08)' }}
           >
             <div className="text-3xl font-black text-white mb-1" style={{ fontFamily: "'Courier New', monospace", textShadow: '0 0 20px rgba(0,212,255,0.4)' }}>
               {s.value}
             </div>
-            <div className="text-xs text-white/30 font-mono">{s.label}</div>
+            <div className="text-xs text-white/40 font-mono">{s.label}</div>
           </div>
         ))}
       </div>

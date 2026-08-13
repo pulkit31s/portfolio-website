@@ -9,13 +9,19 @@ export default function HeroBackground() {
     const el = mountRef.current;
     if (!el) return;
 
-    const scene    = new THREE.Scene();
-    const camera   = new THREE.PerspectiveCamera(60, el.clientWidth / el.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, el.clientWidth / el.clientHeight, 0.1, 1000);
+    let renderer: THREE.WebGLRenderer | null = null;
 
-    renderer.setSize(el.clientWidth, el.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    el.appendChild(renderer.domElement);
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(el.clientWidth, el.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      el.appendChild(renderer.domElement);
+    } catch (err) {
+      console.warn('WebGL unavailable for Hero background, using CSS fallback:', err);
+      return;
+    }
 
     // Torus knot — main sculpture
     const knotGeo = new THREE.TorusKnotGeometry(2.5, 0.6, 200, 32);
@@ -80,12 +86,12 @@ export default function HeroBackground() {
       camera.position.y += (-my - camera.position.y) * 0.03;
       camera.lookAt(scene.position);
 
-      renderer.render(scene, camera);
+      if (renderer) renderer.render(scene, camera);
     };
-    animate();
+    if (renderer) animate();
 
     const handleResize = () => {
-      if (!el) return;
+      if (!el || !renderer) return;
       camera.aspect = el.clientWidth / el.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(el.clientWidth, el.clientHeight);
@@ -94,10 +100,12 @@ export default function HeroBackground() {
 
     return () => {
       cancelAnimationFrame(frame);
-      renderer.dispose();
+      if (renderer) {
+        renderer.dispose();
+        if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
+      }
       window.removeEventListener('mousemove', onMouse);
       window.removeEventListener('resize', handleResize);
-      if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
     };
   }, []);
 

@@ -73,6 +73,112 @@ const defaultExperiences: Experience[] = [
   },
 ];
 
+function parseFlexibleDate(str?: string): Date | null {
+  if (!str || !str.trim()) return null;
+  const s = str.trim().toLowerCase();
+
+  const monthMap: Record<string, number> = {
+    jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2,
+    apr: 3, april: 3, may: 4, jun: 5, june: 5, jul: 6, july: 6,
+    aug: 7, august: 7, sep: 8, september: 8, oct: 9, october: 9,
+    nov: 10, november: 10, dec: 11, december: 11,
+  };
+
+  // Match e.g. "25/05/2025" or "25-05-2025" or "25.05.2025" (DD/MM/YYYY)
+  const dmyMatch = s.match(/^([0-9]{1,2})[\/\-\.\s]+([0-9]{1,2})[\/\-\.\s]+([0-9]{4})$/);
+  if (dmyMatch) {
+    const p1 = parseInt(dmyMatch[1], 10);
+    const p2 = parseInt(dmyMatch[2], 10);
+    const y  = parseInt(dmyMatch[3], 10);
+    let day = p1;
+    let month = p2 - 1;
+    if (p1 <= 12 && p2 > 12) {
+      // MM/DD/YYYY format
+      month = p1 - 1;
+      day = p2;
+    }
+    if (month >= 0 && month <= 11 && !isNaN(y)) {
+      return new Date(y, month, day || 1);
+    }
+  }
+
+  // Match e.g. "2025-05-25" (YYYY-MM-DD)
+  const ymdMatch = s.match(/^([0-9]{4})[\/\-\.\s]+([0-9]{1,2})[\/\-\.\s]+([0-9]{1,2})$/);
+  if (ymdMatch) {
+    const y = parseInt(ymdMatch[1], 10);
+    const m = parseInt(ymdMatch[2], 10) - 1;
+    const d = parseInt(ymdMatch[3], 10);
+    if (m >= 0 && m <= 11 && !isNaN(y)) {
+      return new Date(y, m, d || 1);
+    }
+  }
+
+  // Match e.g. "25 May 2025" or "May 25 2025"
+  const dMyMatch = s.match(/^([0-9]{1,2}|[a-z]{3,9})[\s\/\-\,]+([0-9]{1,2}|[a-z]{3,9})[\s\/\-\,]+([0-9]{4})$/);
+  if (dMyMatch) {
+    const token1 = dMyMatch[1];
+    const token2 = dMyMatch[2];
+    const y = parseInt(dMyMatch[3], 10);
+    let m = -1;
+    if (monthMap[token1] !== undefined) m = monthMap[token1];
+    else if (monthMap[token2] !== undefined) m = monthMap[token2];
+    else {
+      const num1 = parseInt(token1, 10);
+      const num2 = parseInt(token2, 10);
+      if (num1 > 0 && num1 <= 12) m = num1 - 1;
+      else if (num2 > 0 && num2 <= 12) m = num2 - 1;
+    }
+    if (m !== -1 && !isNaN(y)) {
+      return new Date(y, m, 1);
+    }
+  }
+
+  // Match e.g. "Apr 2025", "April 2025", "Apr-2025", "05/2025"
+  const monthYearMatch = s.match(/^([a-z]{3,9}|[0-9]{1,2})[\s\/\-\,\.]+([0-9]{4})$/);
+  if (monthYearMatch) {
+    const mStr = monthYearMatch[1];
+    const year = parseInt(monthYearMatch[2], 10);
+    let month = -1;
+    if (monthMap[mStr] !== undefined) {
+      month = monthMap[mStr];
+    } else {
+      const numM = parseInt(mStr, 10);
+      if (!isNaN(numM) && numM >= 1 && numM <= 12) month = numM - 1;
+    }
+    if (month !== -1 && !isNaN(year)) {
+      return new Date(year, month, 1);
+    }
+  }
+
+  // Match single year e.g. "2025"
+  if (/^[0-9]{4}$/.test(s)) {
+    return new Date(parseInt(s, 10), 0, 1);
+  }
+
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function calcDuration(startDateStr: string, endDateStr?: string, current?: boolean): string {
+  if (!startDateStr) return '';
+  const start = parseFlexibleDate(startDateStr);
+  const end   = current || !endDateStr ? new Date() : parseFlexibleDate(endDateStr);
+
+  if (!start || !end) return '';
+
+  let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
+  if (months <= 0) months = 1;
+
+  const years = Math.floor(months / 12);
+  const remMonths = months % 12;
+
+  const parts = [];
+  if (years > 0) parts.push(`${years} yr${years > 1 ? 's' : ''}`);
+  if (remMonths > 0) parts.push(`${remMonths} mo${remMonths > 1 ? 's' : ''}`);
+
+  return parts.join(' ');
+}
+
 export default function ExperienceSection() {
   const [experiences, setExperiences] = useState<Experience[]>(defaultExperiences);
   const [selected, setSelected] = useState(0);
@@ -85,6 +191,7 @@ export default function ExperienceSection() {
   }, []);
 
   const exp = experiences[selected];
+  const durationText = exp ? calcDuration(exp.startDate, exp.endDate, exp.current) : '';
 
   return (
     <section id="experience" className="py-32 px-6 max-w-6xl mx-auto">
@@ -98,9 +205,10 @@ export default function ExperienceSection() {
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Tab list */}
-        <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible lg:min-w-[220px] pb-2 lg:pb-0">
+        <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible lg:min-w-[240px] pb-2 lg:pb-0">
           {experiences.map((e, i) => {
             const color = typeColors[e.type] || '#00d4ff';
+            const dur   = calcDuration(e.startDate, e.endDate, e.current);
             return (
               <button
                 key={e._id}
@@ -112,12 +220,19 @@ export default function ExperienceSection() {
                 }}
               >
                 <div
-                  className="text-xs font-mono truncate transition-colors"
-                  style={{ color: selected === i ? color : 'rgba(255,255,255,0.5)' }}
+                  className="text-xs font-mono truncate transition-colors font-bold"
+                  style={{ color: selected === i ? color : 'rgba(255,255,255,0.7)' }}
                 >
                   {e.company.split(',')[0]}
                 </div>
-                <div className="text-white/30 text-xs font-mono mt-0.5 capitalize">{e.type}</div>
+                <div className="flex items-center justify-between gap-2 mt-1">
+                  <span className="text-white/30 text-[10px] font-mono capitalize">{e.type}</span>
+                  {dur && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded" style={{ background: `${color}15`, color }}>
+                      {dur}
+                    </span>
+                  )}
+                </div>
               </button>
             );
           })}
@@ -153,8 +268,8 @@ export default function ExperienceSection() {
                 >
                   {exp.type}
                 </div>
-                <p className="text-white/30 text-xs font-mono mt-1">
-                  {exp.startDate} — {exp.current ? 'Present' : exp.endDate}
+                <p className="text-white/40 text-xs font-mono mt-1 font-bold">
+                  {exp.startDate} — {exp.current ? 'Present' : exp.endDate} {durationText && <span className="text-[#00d4ff] font-normal">· {durationText}</span>}
                 </p>
                 <p className="text-white/20 text-xs font-mono">{exp.location}</p>
               </div>
