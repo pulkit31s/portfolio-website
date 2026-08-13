@@ -1,7 +1,20 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-const allLinks = ['About', 'Education', 'Skills', 'Experience', 'Projects', 'Achievements', 'Certifications', 'Contact'];
+const allLinks = ['About', 'Education', 'Skills', 'Stats', 'Experience', 'Projects', 'Achievements', 'Certifications', 'Contact'];
+
+// Map display label → section id
+const linkToId: Record<string, string> = {
+  About:          'about',
+  Education:      'education',
+  Skills:         'skills',
+  Stats:          'coding-stats',
+  Experience:     'experience',
+  Projects:       'projects',
+  Achievements:   'achievements',
+  Certifications: 'certifications',
+  Contact:        'contact',
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled]             = useState(false);
@@ -11,6 +24,7 @@ export default function Navbar() {
   const [enabledSections, setEnabledSections] = useState<Record<string, boolean>>({
     education: true,
     skills: true,
+    codingStats: true,
     experience: true,
     projects: true,
     achievements: true,
@@ -41,19 +55,19 @@ export default function Navbar() {
   }, []);
 
   const links = allLinks.filter(l => {
-    const key = l.toLowerCase();
-    if (key === 'about' || key === 'contact') return true;
-    return enabledSections[key] ?? true;
+    if (l === 'About' || l === 'Contact') return true;
+    if (l === 'Stats') return enabledSections['codingStats'] ?? true;
+    return enabledSections[l.toLowerCase()] ?? true;
   });
 
   // IntersectionObserver for active section highlighting on scroll
   useEffect(() => {
-    const sectionIds = ['about', 'education', 'skills', 'experience', 'projects', 'achievements', 'certifications', 'contact'];
+    const sectionIds = Object.values(linkToId);
     const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            const matchedLabel = allLinks.find(l => l.toLowerCase() === entry.target.id);
+            const matchedLabel = allLinks.find(l => linkToId[l] === entry.target.id);
             if (matchedLabel) setActive(matchedLabel);
           }
         });
@@ -70,7 +84,7 @@ export default function Navbar() {
   }, [enabledSections]);
 
   const scrollTo = (id: string) => {
-    const targetId = id.toLowerCase() === 'about' ? 'about' : id.toLowerCase();
+    const targetId = linkToId[id] || id.toLowerCase();
     document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth' });
     setActive(id);
     setOpen(false);

@@ -9,6 +9,7 @@ import ExperienceSection from '@/components/sections/Experience';
 import Projects from '@/components/sections/Projects';
 import Achievements from '@/components/sections/Achievements';
 import Certifications from '@/components/sections/Certifications';
+import CodingStats from '@/components/sections/CodingStats';
 import Contact from '@/components/sections/Contact';
 import TerminalWidget from '@/components/sections/TerminalWidget';
 
@@ -78,6 +79,16 @@ export default function Home() {
                 <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.15), transparent)' }} />
               </div>
               <Skills />
+            </>
+          )}
+
+          {/* Coding & Competitive Programming Platform Stats */}
+          {sections.codingStats !== false && (
+            <>
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.15), transparent)' }} />
+              </div>
+              <CodingStats />
             </>
           )}
 

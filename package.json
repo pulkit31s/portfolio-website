@@ -12,6 +12,7 @@
     "@react-three/drei": "^9.99.0",
     "@react-three/fiber": "^8.15.0",
     "@types/nodemailer": "^8.0.1",
+    "cheerio": "^1.2.0",
     "dotenv": "^17.4.2",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.400.0",

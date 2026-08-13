@@ -7,10 +7,16 @@ import Link from 'next/link';
 interface Sections {
   education: boolean;
   skills: boolean;
+  codingStats?: boolean;
   experience: boolean;
   projects: boolean;
   achievements: boolean;
   certifications: boolean;
+  showLeetcode?: boolean;
+  showCodeforces?: boolean;
+  showGithub?: boolean;
+  showGfg?: boolean;
+  showCodechef?: boolean;
 }
 
 interface Profile {
@@ -23,6 +29,9 @@ interface Profile {
   githubUrl: string;
   githubUsername: string;
   leetcodeUsername: string;
+  codeforcesUsername?: string;
+  codechefUsername?: string;
+  gfgUsername?: string;
   linkedinUrl: string;
   email: string;
   phone: string;
@@ -40,10 +49,16 @@ interface Profile {
 const defaultSections: Sections = {
   education: true,
   skills: true,
+  codingStats: true,
   experience: true,
   projects: true,
   achievements: true,
   certifications: false,
+  showLeetcode: true,
+  showCodeforces: true,
+  showGithub: true,
+  showGfg: true,
+  showCodechef: true,
 };
 
 const defaultProfile: Profile = {
@@ -62,6 +77,9 @@ const defaultProfile: Profile = {
   githubUrl: 'https://github.com/pulkit31s',
   githubUsername: 'pulkit31s',
   leetcodeUsername: 'pulkit31s',
+  codeforcesUsername: '',
+  codechefUsername: '',
+  gfgUsername: '',
   linkedinUrl: 'https://linkedin.com',
   email: 'hello@example.com',
   phone: '+1 (000) 000-0000',
@@ -334,11 +352,38 @@ export default function AdminProfile() {
                   placeholder="e.g. pulkit31s"
                 />
               </Field>
-              <Field label="LeetCode Username (for Coding Stats Widget)">
+              <Field label="LeetCode Username (for Coding Stats)">
                 <input
                   className={inputCls}
                   value={form.leetcodeUsername || ''}
                   onChange={e => setForm(f => ({ ...f, leetcodeUsername: e.target.value }))}
+                  placeholder="e.g. pulkit31s"
+                />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Field label="Codeforces Handle">
+                <input
+                  className={inputCls}
+                  value={form.codeforcesUsername || ''}
+                  onChange={e => setForm(f => ({ ...f, codeforcesUsername: e.target.value }))}
+                  placeholder="e.g. pulkit31s"
+                />
+              </Field>
+              <Field label="CodeChef Handle">
+                <input
+                  className={inputCls}
+                  value={form.codechefUsername || ''}
+                  onChange={e => setForm(f => ({ ...f, codechefUsername: e.target.value }))}
+                  placeholder="e.g. pulkit31s"
+                />
+              </Field>
+              <Field label="GeeksforGeeks Handle">
+                <input
+                  className={inputCls}
+                  value={form.gfgUsername || ''}
+                  onChange={e => setForm(f => ({ ...f, gfgUsername: e.target.value }))}
                   placeholder="e.g. pulkit31s"
                 />
               </Field>
@@ -465,6 +510,7 @@ export default function AdminProfile() {
             {[
               { key: 'education',      label: 'Education',      icon: '▦' },
               { key: 'skills',         label: 'Skills',         icon: '◎' },
+              { key: 'codingStats',    label: 'Coding Stats',   icon: '⚡' },
               { key: 'experience',     label: 'Experience',     icon: '◉' },
               { key: 'projects',       label: 'Projects',       icon: '◈' },
               { key: 'achievements',   label: 'Achievements',   icon: '★' },
@@ -503,6 +549,72 @@ export default function AdminProfile() {
                       }));
                     }}
                     className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  />
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Per-Platform Coding Card Toggles ── */}
+        <div
+          className="p-6 rounded-3xl space-y-4"
+          style={{ background: 'rgba(13,13,26,0.8)', border: '1px solid rgba(0,212,255,0.12)' }}
+        >
+          <h2 className="text-sm font-mono tracking-widest uppercase text-[#00d4ff] mb-2">
+            Coding Platform Cards
+          </h2>
+          <p className="text-xs font-mono text-white/30 mb-6">
+            Show or hide individual platform cards inside the Coding Stats section.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { key: 'showLeetcode',   label: 'LeetCode',    icon: '⟨/⟩', color: '#ffa116' },
+              { key: 'showCodeforces', label: 'Codeforces',  icon: 'CF',   color: '#00d4ff' },
+              { key: 'showGithub',     label: 'GitHub',      icon: 'GH',   color: '#10b981' },
+              { key: 'showGfg',        label: 'GeeksForGeeks', icon: 'GFG', color: '#22c55e' },
+              { key: 'showCodechef',   label: 'CodeChef',    icon: 'CC',   color: '#a855f7' },
+            ].map(plat => {
+              const currentSections = form.sections || defaultSections;
+              const isOn = currentSections[plat.key as keyof Sections] ?? true;
+              return (
+                <label
+                  key={plat.key}
+                  className="flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all duration-300 select-none"
+                  style={{
+                    background: isOn ? `${plat.color}10` : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${isOn ? `${plat.color}40` : 'rgba(255,255,255,0.06)'}`,
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-mono font-black shrink-0"
+                      style={{
+                        background: isOn ? `${plat.color}20` : 'rgba(255,255,255,0.05)',
+                        color: isOn ? plat.color : 'rgba(255,255,255,0.2)',
+                        border: `1px solid ${isOn ? `${plat.color}30` : 'transparent'}`,
+                      }}
+                    >
+                      {plat.icon}
+                    </span>
+                    <span className="text-sm font-mono text-white">{plat.label}</span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isOn}
+                    onChange={e => {
+                      const checked = e.target.checked;
+                      setForm(f => ({
+                        ...f,
+                        sections: {
+                          ...(f.sections || defaultSections),
+                          [plat.key]: checked,
+                        },
+                      }));
+                    }}
+                    className="w-4 h-4 cursor-pointer"
+                    style={{ accentColor: plat.color }}
                   />
                 </label>
               );
