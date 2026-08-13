@@ -23,7 +23,7 @@ const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/admin/login',
   },
-  session: { strategy: 'jwt' },
+  session: { strategy: 'jwt', maxAge: 600 }, // 10-minute hard session cap
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
