@@ -1,9 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import GithubStatsWidget from '@/components/sections/GithubStatsWidget';
-
-const HeroBackground = dynamic(() => import('@/components/three/HeroBackground'), { ssr: false });
+import HeroBackground from '@/components/three/HeroBackground';
 
 interface Profile {
   name: string;

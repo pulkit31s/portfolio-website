@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/sections/Hero';
 import Education from '@/components/sections/Education';
@@ -12,8 +11,7 @@ import Certifications from '@/components/sections/Certifications';
 import CodingStats from '@/components/sections/CodingStats';
 import Contact from '@/components/sections/Contact';
 import TerminalWidget from '@/components/sections/TerminalWidget';
-
-const LoadingScreen = dynamic(() => import('@/components/three/LoadingScreen'), { ssr: false });
+import LoadingScreen from '@/components/three/LoadingScreen';
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
