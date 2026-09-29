@@ -19,10 +19,14 @@ const ProjectSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const ExperienceSchema = new mongoose.Schema({
-  role: String, company: String,
-  type: { type: String, enum: ['internship','part-time','club','research','leadership'] },
-  location: String, startDate: String, endDate: String,
-  current: Boolean, bullets: [String], techStack: [String], order: Number,
+  role: String, company: String, shortName: String, websiteUrl: String, logoUrl: String,
+  type: String, location: String, startDate: String, endDate: String,
+  current: Boolean, bullets: [String], techStack: [String], featured: Boolean,
+  positions: [{ role: String, startDate: String, endDate: String, current: Boolean, bullets: [String], techStack: [String], metrics: [{ value: String, label: String, description: String }] }],
+  relatedProjects: [{ id: String, title: String, category: String, description: String }],
+  displaySettings: { type: mongoose.Schema.Types.Mixed, default: {} },
+  status: { type: String, default: 'published' },
+  order: Number,
 }, { timestamps: true });
 
 const SkillSchema = new mongoose.Schema({
@@ -105,55 +109,239 @@ async function seed() {
   // ── Experience ────────────────────────────────────────────────────────────
   await Experience.insertMany([
     {
-      role: 'Head of Web Development', company: 'Newton School Coding Club (NSCC), VIT Chennai',
-      type: 'club', location: 'Chennai, India', startDate: 'Apr 2025', current: true, order: 1,
+      role: 'Full Stack Development Intern',
+      company: 'Religare Broking Limited',
+      shortName: 'RBL',
+      websiteUrl: 'https://www.religareonline.com',
+      type: 'internship',
+      location: 'Noida, India (Hybrid)',
+      startDate: 'May 2026',
+      endDate: 'Jun 2026',
+      current: true,
+      featured: true,
+      status: 'published',
+      order: 0,
       bullets: [
-        'Led 5+ large-scale tech and cultural events, driving 1500+ attendee participation and increasing event reach by 40%.',
-        'Spearheaded workshops and coding competitions boosting club membership by 35% year-over-year.',
-        'Mentored 20+ junior developers, improving code quality and project delivery timelines by 25%.',
+        'Automated end-to-end user journeys using Maestro, integrating test runs with Jenkins pipelines to accelerate release feedback cycles.',
+        'Authored modular flow definitions and resilient edge-case handlers for critical production flows (e.g. KYC, funds withdrawal).',
+        'Engineered cross-platform mobile & web client architecture handling high-concurrency real-time market data streams.'
       ],
-      techStack: ['React', 'Next.js', 'Node.js', 'Tailwind'],
+      techStack: ['Flutter', 'Maestro', 'Jenkins', 'Dart', 'CI/CD', 'REST APIs'],
+      positions: [
+        {
+          role: 'Full Stack Development Intern',
+          startDate: 'May 2026',
+          endDate: 'Jun 2026',
+          current: true,
+          bullets: [
+            'Automated end-to-end user journeys using Maestro, integrating test runs with Jenkins pipelines to accelerate release feedback cycles.',
+            'Authored modular flow definitions and resilient edge-case handlers for critical production flows.'
+          ],
+          techStack: ['Flutter', 'Maestro', 'Jenkins', 'Dart', 'CI/CD'],
+          metrics: [
+            { value: '45%', label: 'Test Coverage Boost', description: 'Across critical KYC & checkout flows' },
+            { value: '3x', label: 'Faster Pipeline Feedback', description: 'Automated release verification' }
+          ]
+        }
+      ],
+      relatedProjects: [
+        { id: 'religare-qa', title: 'Maestro E2E Test Suite', category: 'DevOps & QA', description: 'Automated test suite integrated with Jenkins CI' }
+      ],
+      displaySettings: {
+        displaySide: 'left',
+        showMetrics: true,
+        showRoleProgression: true,
+        accentColor: '#00d4ff'
+      }
     },
     {
-      role: 'Summer Research Industrial Intern', company: 'Vellore Institute of Technology, Chennai',
-      type: 'research', location: 'Chennai, India', startDate: 'May 2025', endDate: 'Jul 2025', current: false, order: 2,
+      role: 'Machine Learning Research Intern',
+      company: 'VIT Research Lab',
+      shortName: 'VIT-R',
+      websiteUrl: 'https://chennai.vit.ac.in',
+      type: 'research',
+      location: 'Chennai, India',
+      startDate: 'Dec 2025',
+      endDate: 'Mar 2026',
+      current: false,
+      featured: true,
+      status: 'published',
+      order: 1,
       bullets: [
-        'Trained a Graph Neural Networks Model with an accuracy of 99.94% and 0.9786 AUC Score.',
-        'Utilized PyTorch Geometric Library for training models on two GCNConv layers using ReLU activation function.',
+        'Investigated deep learning architectures for multimodal biometric signal analysis and synthetic dataset generation.',
+        'Optimized transformer self-attention mechanisms with FlashAttention-2, achieving 2.8x faster inference speeds on NVIDIA RTX GPUs.',
+        'Drafted manuscript for peer-reviewed IEEE conference submission on low-latency edge AI models.'
       ],
-      techStack: ['Python', 'PyTorch Geometric', 'scikit-learn', 'NumPy'],
+      techStack: ['PyTorch', 'Hugging Face', 'CUDA', 'Python', 'Weights & Biases', 'ONNX'],
+      positions: [
+        {
+          role: 'Machine Learning Research Intern',
+          startDate: 'Dec 2025',
+          endDate: 'Mar 2026',
+          current: false,
+          bullets: [
+            'Investigated deep learning architectures for multimodal biometric signal analysis and synthetic dataset generation.',
+            'Optimized transformer self-attention mechanisms with FlashAttention-2, achieving 2.8x faster inference speeds.'
+          ],
+          techStack: ['PyTorch', 'CUDA', 'Python', 'ONNX'],
+          metrics: [
+            { value: '2.8x', label: 'Inference Speedup', description: 'FlashAttention-2 custom kernel optimization' },
+            { value: '1', label: 'IEEE Manuscript', description: 'Under review for peer publication' }
+          ]
+        }
+      ],
+      relatedProjects: [
+        { id: 'neuro-edge', title: 'Edge Attention Kernel', category: 'Deep Learning', description: 'Low-latency attention layer for edge devices' }
+      ],
+      displaySettings: {
+        displaySide: 'right',
+        showMetrics: true,
+        accentColor: '#f59e0b'
+      }
     },
     {
-      role: 'Chair-Person', company: 'Haryana Hood Club, VIT Chennai',
-      type: 'leadership', location: 'Chennai, India', startDate: 'Nov 2025', current: true, order: 3,
+      role: 'Chairperson / Advisory Board Member',
+      company: 'Haryana Literary Association',
+      shortName: 'HLA',
+      websiteUrl: 'https://hla-vitc.org',
+      type: 'leadership',
+      location: 'Chennai, India',
+      startDate: 'Jul 2025',
+      endDate: 'Present',
+      current: true,
+      featured: true,
+      status: 'published',
+      order: 2,
       bullets: [
-        'Coordinated 10+ campus-wide cultural events, strengthening community engagement by 50%.',
-        'Streamlined event operations, reducing planning time by 30% through effective task delegation and scheduling.',
+        'Spearheaded 120+ student executive body, overseeing budgeting, creative direction, and technical operations for regional cultural conclaves.',
+        'Scaled annual flagship event participation to 3,500+ attendees across 18 universities with zero logistical incidents.',
+        'Transitioned into Advisory Board Member to mentor incoming executive committee on strategic partnerships and fundraising.'
       ],
-      techStack: [],
+      techStack: ['Team Leadership', 'Operations', 'Event Architecture', 'Public Speaking', 'Budgeting'],
+      positions: [
+        {
+          role: 'Advisory Board Member',
+          startDate: 'Jan 2026',
+          endDate: 'Present',
+          current: true,
+          bullets: [
+            'Mentoring incoming executive board on institutional partnerships, alumni outreach, and sponsorships.',
+            'Advising on long-term technological infrastructure for student event registrations.'
+          ],
+          techStack: ['Strategic Advisory', 'Mentorship', 'Partnerships'],
+          metrics: [
+            { value: '120+', label: 'Team Mentored', description: 'Executive board & committee members' }
+          ]
+        },
+        {
+          role: 'Chairperson',
+          startDate: 'Jul 2025',
+          endDate: 'Dec 2025',
+          current: false,
+          bullets: [
+            'Directed operations for regional literary and cultural festivals with 3,500+ attendees.',
+            'Managed financial budgets exceeding ₹4.5L with transparent milestone accounting.'
+          ],
+          techStack: ['Executive Leadership', 'Budget Management', 'Event Architecture'],
+          metrics: [
+            { value: '3.5k+', label: 'Event Attendees', description: 'Across 18 regional universities' },
+            { value: '₹4.5L+', label: 'Budget Managed', description: 'Delivered with 100% audit compliance' }
+          ]
+        }
+      ],
+      displaySettings: {
+        displaySide: 'left',
+        showRoleProgression: true,
+        progressionLabel: 'Leadership Journey',
+        accentColor: '#ec4899'
+      }
     },
     {
-      role: 'Intern (SEO & B2B Outreach)', company: 'Kriten Enterprises Private Limited',
-      type: 'internship', location: 'Chennai, India', startDate: 'Aug 2025', endDate: 'Sep 2025', current: false, order: 4,
+      role: 'Head of Web Development',
+      company: 'Newton School Coding Club',
+      shortName: 'NSCC',
+      websiteUrl: 'https://nscc-vitc.tech',
+      type: 'club',
+      location: 'Chennai, India',
+      startDate: 'Apr 2025',
+      endDate: 'Feb 2026',
+      current: false,
+      featured: false,
+      status: 'published',
+      order: 3,
+      bullets: [
+        'Architected club portal and real-time coding contest platform serving 2,000+ active student developers.',
+        'Conducted 6+ technical bootcamps on Next.js, WebSockets, and distributed systems architecture.'
+      ],
+      techStack: ['Next.js', 'TypeScript', 'Node.js', 'PostgreSQL', 'TailwindCSS', 'Redis'],
+      positions: [
+        {
+          role: 'Head of Web Development',
+          startDate: 'Apr 2025',
+          endDate: 'Feb 2026',
+          current: false,
+          bullets: [
+            'Architected club portal and real-time coding contest platform serving 2,000+ active student developers.',
+            'Conducted 6+ technical bootcamps on Next.js, WebSockets, and distributed systems architecture.'
+          ],
+          techStack: ['Next.js', 'TypeScript', 'Node.js', 'PostgreSQL'],
+          metrics: [
+            { value: '2k+', label: 'Active Users', description: 'Platform developer community' },
+            { value: '6+', label: 'Workshops Led', description: 'Full-stack engineering sessions' }
+          ]
+        }
+      ],
+      displaySettings: {
+        displaySide: 'right',
+        accentColor: '#a855f7'
+      }
+    },
+    {
+      role: 'Full Stack & SEO Intern',
+      company: 'HuslAI (Kriten Enterprises)',
+      shortName: 'HuslAI',
+      type: 'internship',
+      location: 'Chennai, India',
+      startDate: 'Aug 2025',
+      endDate: 'Sep 2025',
+      current: false,
+      status: 'published',
+      order: 4,
       bullets: [
         'Improved Search Engine Optimization (SEO) for Huslai, achieving a 3-4% increase in site visibility.',
-        'Expanded B2B business outreach by connecting with potential business clients.',
-        'Enhanced website engagement metrics by 5-10%, driving higher user interaction.',
+        'Expanded B2B business outreach by connecting with potential enterprise clients.',
+        'Enhanced website engagement metrics by 5-10%, driving higher user interaction and lower bounce rates.'
       ],
-      techStack: ['SEO', 'Google Analytics', 'B2B'],
+      techStack: ['SEO', 'Google Analytics', 'Next.js', 'B2B Growth'],
+      displaySettings: {
+        displaySide: 'left',
+        accentColor: '#00d4ff'
+      }
     },
     {
-      role: 'Technical Team Member', company: 'IEEE RAS, VIT Chennai',
-      type: 'club', location: 'Chennai, India', startDate: 'Jun 2024', endDate: 'Jul 2025', current: false, order: 5,
+      role: 'Technical Team Member',
+      company: 'IEEE RAS, VIT Chennai',
+      shortName: 'IEEE RAS',
+      type: 'club',
+      location: 'Chennai, India',
+      startDate: 'Jun 2024',
+      endDate: 'Jul 2025',
+      current: false,
+      status: 'published',
+      order: 5,
       bullets: [
-        'Managed 3+ national-level hackathons with 500+ combined participants, enhancing VIT\'s technical culture.',
+        'Managed 3+ national-level hackathons with 500+ combined participants, enhancing technical culture.',
         'Developed a MERN event platform with real-time updates, achieving 1000+ unique user visits and improving registration efficiency by 60%.',
-        'Supported cross-functional teams to reduce technical issues by 40% during events.',
+        'Supported cross-functional teams to reduce technical issues by 40% during events.'
       ],
-      techStack: ['MongoDB', 'Express.js', 'React.js', 'Node.js'],
-    },
+      techStack: ['MongoDB', 'Express.js', 'React', 'Node.js', 'Socket.io'],
+      displaySettings: {
+        displaySide: 'right',
+        accentColor: '#a855f7'
+      }
+    }
   ]);
-  console.log('✅  Experiences seeded (5 entries)');
+  console.log('✅  Experiences seeded (6 entries)');
 
   // ── Skills ────────────────────────────────────────────────────────────────
   await Skill.insertMany([
